@@ -1,11 +1,13 @@
-import { DeepPartial } from 'typeorm'
+/**
+ * grpcのメッセージを変換するユーティリティ
+ */
+
 import { v4 } from 'uuid'
 import {
   ICourseSchedule,
   IRegisteredCourse,
   IRegisteredCourseWithoutId,
   CourseMethod as GCourseMethod,
-  CourseSchedule as GCourseSchedule,
 } from '../../generated'
 import { RegisteredCourse } from '../database/model/registeredCourse'
 import { CourseMethod, CourseSchedule, Day, Module } from '../database/type'

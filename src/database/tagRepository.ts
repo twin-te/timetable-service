@@ -2,6 +2,9 @@ import { DeepPartial, getConnection } from 'typeorm'
 import { Tag } from './model/tag'
 import { ModelType } from './type'
 
+/**
+ * タグのレポジトリモデル
+ */
 export default {
   create(t: DeepPartial<Tag>[]): Promise<ModelType<Tag>[]> {
     const repository = getConnection().getRepository(Tag)

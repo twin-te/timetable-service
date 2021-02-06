@@ -2,6 +2,9 @@ import { DeepPartial, getConnection } from 'typeorm'
 import { RegisteredCourse } from './model/registeredCourse'
 import { ModelType } from './type'
 
+/**
+ * 登録済み講義のレポジトリモデル
+ */
 export default {
   async read(
     userId: string,

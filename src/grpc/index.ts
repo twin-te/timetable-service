@@ -16,6 +16,9 @@ const def = protoLoader.loadSync(
 const timetableServiceDef = (grpc.loadPackageDefinition(def)
   .TimetableService as ServiceClientConstructor).service
 
+/**
+ * grpcServer開始
+ */
 export async function startGrpcServer() {
   return new Promise<void>((resolve, reject) => {
     if (server) reject(new Error('already started'))
@@ -36,6 +39,9 @@ export async function startGrpcServer() {
   })
 }
 
+/**
+ * grpcServer停止
+ */
 export async function stopGrpcServer() {
   return new Promise<void>((resolve, reject) => {
     if (!server) throw new Error('not started')

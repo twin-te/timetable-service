@@ -6,6 +6,10 @@ import {
 import { grpcLogger as logger } from '../logger'
 import { GrpcServer } from './types/type'
 
+/**
+ * grpc通信のログを記録する
+ * @param i 任意のService実装
+ */
 export function applyLogger<T extends { [key: string]: any }>(
   i: T
 ): T extends GrpcServer<infer U> ? GrpcServer<U> : never {
