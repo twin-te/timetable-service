@@ -5,6 +5,7 @@ import {
   DeleteRegisteredCoursesResponse,
   DeleteTagsResponse,
   GetRegisteredCoursesResponse,
+  GetTagsResponse,
   TimetableService,
   UpdateRegisteredCoursesResponse,
   UpdateTagsResponse,
@@ -22,6 +23,9 @@ function handleError(callback: sendUnaryData<any>) {
   }
 }
 
+/**
+ * TimetableServiceの実装
+ */
 export const timetableService: GrpcServer<TimetableService> = {
   getRegisteredCourses({ request }, callback) {
     registeredCourseRepository
@@ -36,7 +40,14 @@ export const timetableService: GrpcServer<TimetableService> = {
       })
       .catch(handleError(callback))
   },
-  getTags({ request }, callback) {},
+  getTags({ request }, callback) {
+    tagRepository
+      .read(request.userId)
+      .then((tags) => {
+        callback(null, GetTagsResponse.create({ tags }))
+      })
+      .catch(handleError(callback))
+  },
   createRegisteredCourses({ request }, callback) {
     registeredCourseRepository
       .create(grpcCourseToEntity(request.courses))
