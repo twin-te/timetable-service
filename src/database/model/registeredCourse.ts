@@ -72,7 +72,7 @@ export class RegisteredCourse {
   })
   schedules!: CourseSchedule[] | null
 
-  @ManyToMany((type) => Tag)
+  @ManyToMany((type) => Tag, { cascade: ['remove'] })
   @JoinTable({
     name: 'registered_course_tags',
     joinColumn: {
