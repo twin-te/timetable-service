@@ -1,0 +1,83 @@
+syntax="proto3";
+
+import "protos/Nullable.proto";
+import "protos/Message.proto";
+
+service TimetableService {
+  /* 指定されたユーザーの登録済み講義を取得する */
+  rpc GetRegisteredCourses(GetRegisteredCoursesRequest) returns (GetRegisteredCoursesResponse);
+  /* 指定されたユーザーのタグをすべて取得する */
+  rpc GetTags(GetTagsRequest) returns (GetTagsResponse);
+  /* 講義を登録する */
+  rpc CreateRegisteredCourses(CreateRegisterCoursesRequest) returns (CreateRegisterCoursesResponse);
+  /* タグを作成する */
+  rpc CreateTags(CreateTagsRequest) returns (CreateTagsResponse);
+  /* 登録済みの講義を更新する */
+  rpc UpdateRegisteredCourses(UpdateRegisteredCoursesRequest) returns (UpdateRegisteredCoursesResponse);
+  /* 登録済みのタグを更新する */
+  rpc UpdateTags(UpdateTagsRequest) returns (UpdateTagsResponse);
+  /* 登録済みの講義を削除する */
+  rpc DeleteRegisteredCourses(DeleteRegisteredCoursesRequest) returns (DeleteRegisteredCoursesResponse);
+  /* 登録済みのタグを削除する */
+  rpc DeleteTags(DeleteTagsRequest) returns (DeleteTagsResponse);
+}
+
+message GetRegisteredCoursesRequest {
+  string userId = 1;
+  int32 year = 2;
+}
+message GetRegisteredCoursesResponse {
+  repeated RegisteredCourse courses = 1;
+}
+
+
+message GetTagsRequest {
+  string userId = 1;
+}
+message GetTagsResponse {
+  repeated Tag tags = 1;
+}
+
+
+message CreateRegisterCoursesRequest {
+  repeated RegisteredCourseWithoutId courses = 1;
+}
+message CreateRegisterCoursesResponse {
+  repeated RegisteredCourse courses = 1;
+}
+
+
+message CreateTagsRequest {
+  repeated TagWithoutId tags = 1;
+}
+message CreateTagsResponse {
+  repeated Tag tags = 1;
+}
+
+
+message UpdateRegisteredCoursesRequest {
+  repeated RegisteredCourse courses = 1;
+}
+message UpdateRegisteredCoursesResponse {
+  repeated RegisteredCourse courses = 1;
+}
+
+
+message UpdateTagsRequest { 
+  repeated Tag tags = 1;
+}
+message UpdateTagsResponse {
+  repeated Tag tags = 1;
+}
+
+
+message DeleteRegisteredCoursesRequest {
+  repeated string ids = 1;
+}
+message DeleteRegisteredCoursesResponse {}
+
+
+message DeleteTagsRequest {
+  repeated string ids = 1;
+}
+message DeleteTagsResponse {}

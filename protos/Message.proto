@@ -1,0 +1,143 @@
+syntax="proto3";
+
+import "protos/Nullable.proto";
+
+/* 講義スケジュール */
+message CourseSchedule {
+  enum Module {
+    SpringA = 0;
+    SpringB = 1;
+    SpringC = 2;
+    FallA = 3;
+    FallB = 4;
+    FallC = 5;
+    SummerVacation = 6;
+    SpringVacation = 7;
+    Annual = 8;
+    UnknownModule = 9;
+  }
+  
+  enum Day { 
+    Sun = 0;
+    Mon = 1;
+    Tue = 2;
+    Wed = 3;
+    Thu = 4;
+    Fri = 5;
+    Sat = 6;
+    Intensive = 7;
+    Appointment = 8;
+    AnyTime = 9;
+    UnknownDay = 10;
+  }
+
+  Module module = 1;
+  Day day = 2;
+  int32 period = 3;
+  string room = 4;
+}
+
+/* 講義スケジュール nullable化 */
+message NullableCourseScheduleArray {
+  bool hasValue = 1;
+  repeated CourseSchedule value = 2;
+}
+
+/* 開講種別 */
+enum CourseMethod {
+  OnlineAsynchronous = 0;
+  OnlineSynchronous = 1;
+  FaceToFace = 2;
+  Others = 3;
+}
+
+/* 講義種別nullable化 */
+message NullableCourseMethodArray {
+  bool hasValue = 1;
+  repeated CourseMethod value = 2;
+}
+
+/* タグ情報 */
+message Tag {
+  string id = 1;
+  string userId = 2;
+  string name = 3;
+}
+
+/* タグ情報 id未確定（作成時） */
+message TagWithoutId {
+  string userId = 2;
+  string name = 3;
+}
+
+/* ベースの講義がある講義情報 */
+message HasBaseRegisteredCourse {
+  string id = 1;
+  string userId = 2;
+  int32 year = 3;
+  string courseId = 4;
+  NullableString name = 5;
+  NullableString instructor = 6;
+  NullableFloat credit = 7;
+  NullableCourseMethodArray methods = 8;
+  NullableCourseScheduleArray schedules = 9;
+  repeated string tagIds = 10;
+}
+
+/* ベースの講義がない講義情報 */
+message CustomRegisteredCourse {
+  string id = 1;
+  string userId = 2;
+  int32 year = 3;
+  // string courseId = 4;
+  string name = 5;
+  string instructor = 6;
+  float credit = 7;
+  repeated CourseMethod methods = 8;
+  repeated CourseSchedule schedules = 9;
+  repeated string tagIds = 10;
+}
+
+/* ベースの講義がある講義情報 idが確定してない（作成時） */
+message HasBaseRegisteredCourseWithoutId {
+  // NullableString id = 1;
+  string userId = 2;
+  int32 year = 3;
+  string courseId = 4;
+  NullableString name = 5;
+  NullableString instructor = 6;
+  NullableFloat credit = 7;
+  NullableCourseMethodArray methods = 8;
+  NullableCourseScheduleArray schedules = 9;
+  repeated string tagIds = 10;
+}
+
+/* ベースの講義がな無い講義情報 idが確定してない（作成時） */
+message CustomRegisteredCourseWithoutId {
+  // string id = 1;
+  string userId = 2;
+  int32 year = 3;
+  // string courseId = 4;
+  string name = 5;
+  string instructor = 6;
+  float credit = 7;
+  repeated CourseMethod methods = 8;
+  repeated CourseSchedule schedules = 9;
+  repeated string tagIds = 10;
+}
+
+/* 登録済みの講義情報 */
+message RegisteredCourse {
+  oneof RegisteredCourse {
+    HasBaseRegisteredCourse hasBaseRegisteredCourse = 1;
+    CustomRegisteredCourse customRegisteredCourse = 2;
+  }
+}
+
+/* idが確定してない講義情報（作成時） */
+message RegisteredCourseWithoutId {
+  oneof RegisteredCourseWithoutId {
+    HasBaseRegisteredCourseWithoutId hasBaseRegisteredCourse = 1;
+    CustomRegisteredCourseWithoutId customRegisteredCourse = 2;
+  }
+}

@@ -1,0 +1,16 @@
+syntax="proto3";
+
+message NullableString {
+  bool hasValue = 1;
+  string value = 2;
+}
+
+message NullableInt32 {
+  bool hasValue = 1;
+  int32 value = 2;
+}
+
+message NullableFloat {
+  bool hasValue = 1;
+  float value = 2;
+}
