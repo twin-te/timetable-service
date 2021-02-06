@@ -1,0 +1,47 @@
+{
+  "name": "timetable-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "cross-env LOG_LEVEL=trace ts-node ./src/index.ts",
+    "build": "tsc",
+    "proto": "./proto-gen.sh",
+    "test": "cross-env LOG_LEVEL=off jest --runInBand --coverage",
+    "client": "grpcc --proto ./protos/TimetableService.proto --address localhost:50051 -i",
+    "lint": "eslint src/**/*.ts"
+  },
+  "devDependencies": {
+    "@types/google-protobuf": "^3.7.4",
+    "@types/jest": "^26.0.20",
+    "@types/node": "^14.14.20",
+    "@types/uuid": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^4.12.0",
+    "@typescript-eslint/parser": "^4.12.0",
+    "eslint": "^7.12.1",
+    "eslint-config-prettier": "^7.1.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.1.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-promise": "^4.2.1",
+    "grpcc": "^1.1.3",
+    "jest": "^26.6.3",
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.4.4",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.3"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.2.6",
+    "@grpc/proto-loader": "^0.5.6",
+    "cross-env": "^7.0.3",
+    "log4js": "^6.3.0",
+    "pg": "^8.5.1",
+    "protobufjs": "github:iFwu/protobuf.js",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.29",
+    "uuid": "^8.3.2"
+  }
+}
