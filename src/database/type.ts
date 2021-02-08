@@ -1,3 +1,5 @@
+import { RegisteredCourse } from './model/registeredCourse'
+
 export enum CourseMethod {
   OnlineAsynchronous = 'OnlineAsynchronous',
   OnlineSynchronous = 'OnlineSynchronous',
@@ -42,3 +44,25 @@ export type CourseSchedule = {
 export type ModelType<T> = {
   [P in keyof T]: T[P]
 }
+
+type MakePartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+
+type UnwrapArray<T> = T extends Array<infer U> ? U : T
+
+type ConditionalArrayWrap<C, T> = C extends Array<any> ? T[] : T
+
+export type NestedPartial<
+  T,
+  U extends keyof T,
+  V extends keyof UnwrapArray<T[U]>
+> = Omit<T, U> &
+  {
+    [K in U]: ConditionalArrayWrap<T[K], MakePartial<UnwrapArray<T[K]>, V>>
+  }
+
+type PickByValueType<T, U> = {
+  [K in keyof T as T[K] extends U ? K : never]: T[K]
+}
+
+export type NullableOptional<T> = Partial<PickByValueType<T, null | any>> &
+  PickByValueType<T, string | number | boolean | symbol | bigint | object>

@@ -1,6 +1,12 @@
 import { DeepPartial, getConnection } from 'typeorm'
 import { RegisteredCourse } from './model/registeredCourse'
-import { ModelType } from './type'
+import { ModelType, NestedPartial, NullableOptional } from './type'
+
+type Input = NestedPartial<
+  NullableOptional<RegisteredCourse>,
+  'tags',
+  'name' | 'userId' | 'courses'
+>[]
 
 /**
  * 登録済み講義のレポジトリモデル
@@ -17,15 +23,11 @@ export default {
     })
     return res
   },
-  create(
-    c: DeepPartial<RegisteredCourse>[]
-  ): Promise<ModelType<RegisteredCourse[]>> {
+  create(c: Input): Promise<ModelType<RegisteredCourse[]>> {
     const repository = getConnection().getRepository(RegisteredCourse)
     return repository.save(repository.create(c))
   },
-  async update(
-    c: DeepPartial<RegisteredCourse>[]
-  ): Promise<ModelType<RegisteredCourse[]> | undefined> {
+  async update(c: Input): Promise<ModelType<RegisteredCourse[]> | undefined> {
     const repository = getConnection().getRepository(RegisteredCourse)
     if ((await repository.findByIds(c.map((cc) => cc.id))).length !== c.length)
       return
