@@ -632,6 +632,11 @@
     "@types/long" "*"
     "@types/node" "*"
 
+"@types/clone@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@types/clone/-/clone-2.1.0.tgz#cb888a3fe5319275b566ae3a9bc606e310c533d4"
+  integrity sha512-d/aS/lPOnUSruPhgNtT8jW39fHRVTLQy9sodysP1kkG8EdAtdZu1vt8NJaYA8w/6Z9j8izkAsx1A/yJhcYR1CA==
+
 "@types/google-protobuf@^3.7.4":
   version "3.7.4"
   resolved "https://registry.yarnpkg.com/@types/google-protobuf/-/google-protobuf-3.7.4.tgz#1621c50ceaf5aefa699851da8e0ea606a2943a39"
@@ -1412,6 +1417,11 @@ cliui@^7.0.2:
     string-width "^4.2.0"
     strip-ansi "^6.0.0"
     wrap-ansi "^7.0.0"
+
+clone@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
+  integrity sha1-G39Ln1kfHo+DZwQBYANFoCiHQ18=
 
 co@^4.6.0:
   version "4.6.0"

@@ -5,13 +5,14 @@
   "license": "MIT",
   "scripts": {
     "dev": "cross-env LOG_LEVEL=trace ts-node ./src/index.ts",
-    "build": "tsc",
+    "build": "rm -rf ./dist && tsc && rm -rf ./dist/__tests__ && mv ./dist/src/* ./dist",
     "proto": "./proto-gen.sh",
     "test": "cross-env LOG_LEVEL=off jest --runInBand --coverage",
     "client": "grpcc --proto ./protos/TimetableService.proto --address localhost:50051 -i",
     "lint": "eslint src/**/*.ts"
   },
   "devDependencies": {
+    "@types/clone": "^2.1.0",
     "@types/google-protobuf": "^3.7.4",
     "@types/jest": "^26.0.20",
     "@types/node": "^14.14.20",
@@ -36,6 +37,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.2.6",
     "@grpc/proto-loader": "^0.5.6",
+    "clone": "^2.1.2",
     "cross-env": "^7.0.3",
     "log4js": "^6.3.0",
     "pg": "^8.5.1",
