@@ -37,7 +37,7 @@ export function grpcCourseToEntity(
     )
     .map(({ tagIds, schedules, methods, ...c }) => ({
       id: v4(),
-      tags: tagIds.map((id) => ({ id })),
+      tags: (tagIds ?? []).map((id) => ({ id })),
       schedules: grpcScheduleToEntity(schedules),
       methods: methods
         ? methods.map((m) => Object.values(CourseMethod)[m])
