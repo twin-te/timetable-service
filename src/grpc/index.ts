@@ -25,7 +25,7 @@ export async function startGrpcServer() {
     server = new grpc.Server()
     server.addService(timetableServiceDef, applyLogger(timetableService))
     server.bindAsync(
-      'localhost:50051',
+      '0.0.0.0:50051',
       grpc.ServerCredentials.createInsecure(),
       (err) => {
         if (err) reject(err)
