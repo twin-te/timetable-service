@@ -1,3 +1,5 @@
+mkdir -p generated
+
 yarn pbjs \
   --target static-module \
   --no-encode \
