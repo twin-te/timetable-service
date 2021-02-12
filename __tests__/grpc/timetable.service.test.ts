@@ -162,6 +162,35 @@ describe('createRegisteredCourses', () => {
     )
   })
 
+  test('invalid argument', (done) => {
+    mocked(registeredCourseRepository.create).mockImplementation(async () => [])
+    client.createRegisteredCourses(
+      {
+        courses: [
+          // @ts-ignore
+          wrapNullableObject({ userId }, [
+            // @ts-ignore
+            'name',
+            // @ts-ignore
+            'courseId',
+            // @ts-ignore
+            'instructor',
+            // @ts-ignore
+            'credit',
+            // @ts-ignore
+            'methods',
+            // @ts-ignore
+            'schedules',
+          ]),
+        ],
+      },
+      (err, res) => {
+        expect(err?.code).toBe(Status.INVALID_ARGUMENT)
+        done()
+      }
+    )
+  })
+
   test('unexpected error!', (done) => {
     mocked(registeredCourseRepository.create).mockImplementation(
       throwUnexpectedError

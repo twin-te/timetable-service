@@ -2,6 +2,7 @@
  * grpcのメッセージを変換するユーティリティ
  */
 
+import { Status } from '@grpc/grpc-js/build/src/constants'
 import { v4 } from 'uuid'
 import {
   ICourseSchedule,
@@ -27,18 +28,29 @@ function grpcScheduleToEntity(
 }
 
 export function grpcCourseToEntity(
-  courses: DeepRequired<IRegisteredCourseWithoutId>[]
+  courses: DeepRequired<IRegisteredCourseWithoutId | IRegisteredCourse>[]
 ) {
   return courses
     .map(unwrapNullableObject)
     .map(({ schedules, methods, ...c }) => ({
-      id: v4(),
+      id: 'id' in c ? c.id : v4(),
       schedules: grpcScheduleToEntity(schedules),
       methods: methods
         ? methods.map((m) => Object.values(CourseMethod)[m])
         : null,
       ...c,
     }))
+    .map((c) => {
+      if (
+        !c.courseId &&
+        (!c.name || !c.instructor || !c.credit || !c.methods || !c.schedules)
+      )
+        throw Object.assign(
+          new Error('nullが許可されるのはベース講義がある場合のみです'),
+          { code: Status.INVALID_ARGUMENT }
+        )
+      else return c
+    })
 }
 
 function entityToGrpcSchedule(
