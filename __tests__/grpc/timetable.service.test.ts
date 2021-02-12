@@ -17,6 +17,7 @@ import { deepContaining } from '../_deepContaining'
 import tagRepository from '../../src/database/tagRepository'
 import { Status } from '@grpc/grpc-js/build/src/constants'
 import { grpcCourseToEntity } from '../../src/grpc/converter'
+import { wrapNullableObject } from '../../src/grpc/nullable'
 
 jest.mock('../../src/database/registeredCourseRepository')
 jest.mock('../../src/database/tagRepository')
@@ -46,27 +47,34 @@ beforeAll(async () => {
 })
 
 const courses: IRegisteredCourseWithoutId[] = [
-  { hasBaseRegisteredCourse: { userId, courseId: v4(), tagIds: [v4()] } },
+  { userId, courseId: v4(), tags: [{ id: v4() }] },
   {
-    customRegisteredCourse: {
-      userId,
-      name: 'test name',
-      year: 2020,
-      instructor: 'test instructor',
-      credit: 1.5,
-      methods: [CourseMethod.FaceToFace],
-      tagIds: [v4()],
-      schedules: [
-        {
-          module: CourseSchedule.Module.SpringA,
-          day: CourseSchedule.Day.Mon,
-          period: 1,
-          room: '3A201',
-        },
-      ],
-    },
+    userId,
+    name: 'test name',
+    year: 2020,
+    instructor: 'test instructor',
+    credit: 1.5,
+    methods: [CourseMethod.FaceToFace],
+    tags: [{ id: v4() }],
+    schedules: [
+      {
+        module: CourseSchedule.Module.SpringA,
+        day: CourseSchedule.Day.Mon,
+        period: 1,
+        room: '3A201',
+      },
+    ],
   },
-]
+].map((c) =>
+  wrapNullableObject(c, [
+    'name',
+    'courseId',
+    'instructor',
+    'credit',
+    'methods',
+    'schedules',
+  ])
+)
 
 const tags: ITagWithoutId[] = [{ userId, name: 'test tag' }]
 

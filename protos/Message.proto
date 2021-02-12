@@ -70,74 +70,34 @@ message TagWithoutId {
   string name = 3;
 }
 
-/* ベースの講義がある講義情報 */
-message HasBaseRegisteredCourse {
+message TagId {
   string id = 1;
-  string userId = 2;
-  int32 year = 3;
-  string courseId = 4;
-  NullableString name = 5;
-  NullableString instructor = 6;
-  NullableFloat credit = 7;
-  NullableCourseMethodArray methods = 8;
-  NullableCourseScheduleArray schedules = 9;
-  repeated string tagIds = 10;
-}
-
-/* ベースの講義がない講義情報 */
-message CustomRegisteredCourse {
-  string id = 1;
-  string userId = 2;
-  int32 year = 3;
-  // string courseId = 4;
-  string name = 5;
-  string instructor = 6;
-  float credit = 7;
-  repeated CourseMethod methods = 8;
-  repeated CourseSchedule schedules = 9;
-  repeated string tagIds = 10;
-}
-
-/* ベースの講義がある講義情報 idが確定してない（作成時） */
-message HasBaseRegisteredCourseWithoutId {
-  // NullableString id = 1;
-  string userId = 2;
-  int32 year = 3;
-  string courseId = 4;
-  NullableString name = 5;
-  NullableString instructor = 6;
-  NullableFloat credit = 7;
-  NullableCourseMethodArray methods = 8;
-  NullableCourseScheduleArray schedules = 9;
-  repeated string tagIds = 10;
-}
-
-/* ベースの講義がな無い講義情報 idが確定してない（作成時） */
-message CustomRegisteredCourseWithoutId {
-  // string id = 1;
-  string userId = 2;
-  int32 year = 3;
-  // string courseId = 4;
-  string name = 5;
-  string instructor = 6;
-  float credit = 7;
-  repeated CourseMethod methods = 8;
-  repeated CourseSchedule schedules = 9;
-  repeated string tagIds = 10;
 }
 
 /* 登録済みの講義情報 */
 message RegisteredCourse {
-  oneof RegisteredCourse {
-    HasBaseRegisteredCourse hasBaseRegisteredCourse = 1;
-    CustomRegisteredCourse customRegisteredCourse = 2;
-  }
+  string id = 1;
+  string userId = 2;
+  int32 year = 3;
+  NullableString courseId = 4;
+  NullableString name = 5;
+  NullableString instructor = 6;
+  NullableFloat credit = 7;
+  NullableCourseMethodArray methods = 8;
+  NullableCourseScheduleArray schedules = 9;
+  repeated TagId tags = 10;
 }
 
 /* idが確定してない講義情報（作成時） */
 message RegisteredCourseWithoutId {
-  oneof RegisteredCourseWithoutId {
-    HasBaseRegisteredCourseWithoutId hasBaseRegisteredCourse = 1;
-    CustomRegisteredCourseWithoutId customRegisteredCourse = 2;
-  }
+  //string id = 1;
+  string userId = 2;
+  int32 year = 3;
+  NullableString courseId = 4;
+  NullableString name = 5;
+  NullableString instructor = 6;
+  NullableFloat credit = 7;
+  NullableCourseMethodArray methods = 8;
+  NullableCourseScheduleArray schedules = 9;
+  repeated TagId tags = 10;
 }

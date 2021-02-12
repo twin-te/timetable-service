@@ -30,14 +30,9 @@ export function grpcCourseToEntity(
   courses: DeepRequired<IRegisteredCourseWithoutId>[]
 ) {
   return courses
-    .map((c) =>
-      c.hasBaseRegisteredCourse
-        ? unwrapNullableObject(c.hasBaseRegisteredCourse)
-        : { ...c.customRegisteredCourse, courseId: null }
-    )
-    .map(({ tagIds, schedules, methods, ...c }) => ({
+    .map(unwrapNullableObject)
+    .map(({ schedules, methods, ...c }) => ({
       id: v4(),
-      tags: (tagIds ?? []).map((id) => ({ id })),
       schedules: grpcScheduleToEntity(schedules),
       methods: methods
         ? methods.map((m) => Object.values(CourseMethod)[m])
@@ -62,25 +57,19 @@ export function entityToGrpcCourse(
   courses: RegisteredCourse[]
 ): IRegisteredCourse[] {
   return courses
-    .map(({ schedules, methods, tags, ...c }) => ({
+    .map(({ schedules, methods, ...c }) => ({
       ...c,
       schedules: entityToGrpcSchedule(schedules),
       methods: methods?.map((m) => GCourseMethod[CourseMethod[m]]),
-      tagIds: tags.map((t) => t.id),
     }))
     .map((c) =>
-      c.courseId
-        ? {
-            hasBaseRegisteredCourse: wrapNullableObject(c, [
-              'name',
-              'instructor',
-              'credit',
-              'methods',
-              'schedules',
-            ]),
-          }
-        : {
-            customRegisteredCourse: c,
-          }
+      wrapNullableObject(c, [
+        'courseId',
+        'name',
+        'instructor',
+        'credit',
+        'methods',
+        'schedules',
+      ])
     )
 }
