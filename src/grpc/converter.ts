@@ -43,7 +43,11 @@ export function grpcCourseToEntity(
     .map((c) => {
       if (
         !c.courseId &&
-        (!c.name || !c.instructor || !c.credit || !c.methods || !c.schedules)
+        (!hasValue(c.name) ||
+          !hasValue(c.instructor) ||
+          !hasValue(c.credit) ||
+          !hasValue(c.methods) ||
+          !hasValue(c.schedules))
       )
         throw Object.assign(
           new Error('nullが許可されるのはベース講義がある場合のみです'),
@@ -84,4 +88,8 @@ export function entityToGrpcCourse(
         'schedules',
       ])
     )
+}
+
+function hasValue(o: any): boolean {
+  return o !== null || typeof o !== 'undefined'
 }
