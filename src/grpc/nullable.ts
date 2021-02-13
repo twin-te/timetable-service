@@ -39,7 +39,12 @@ export function unwrapNullableObject<T extends { [key: string]: any }>(
   const res = { ...obj }
   Object.keys(obj).forEach((k) => {
     const v = obj[k]
-    if (typeof v === 'object' && 'hasValue' in v && 'value' in v) {
+    if (
+      v !== null &&
+      typeof v === 'object' &&
+      'hasValue' in v &&
+      'value' in v
+    ) {
       // @ts-ignore
       res[k] = unwrapNullable(v)
     }

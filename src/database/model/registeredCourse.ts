@@ -1,10 +1,18 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from 'typeorm'
+import {
+  Column,
+  Entity,
+  Index,
+  JoinTable,
+  ManyToMany,
+  PrimaryColumn,
+} from 'typeorm'
 import { CourseMethod, CourseSchedule } from '../type'
 import { Tag } from './tag'
 
 @Entity({
   name: 'registered_courses',
 })
+@Index(['userId', 'courseId'], { unique: true })
 export class RegisteredCourse {
   @PrimaryColumn({
     name: 'id',

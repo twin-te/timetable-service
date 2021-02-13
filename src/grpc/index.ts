@@ -11,7 +11,8 @@ let server: grpc.Server | undefined
 const def = protoLoader.loadSync(
   ['TimetableService.proto', 'Message.proto', 'Nullable.proto'].map((f) =>
     path.resolve(__dirname, `../../protos/${f}`)
-  )
+  ),
+  { defaults: true }
 )
 const timetableServiceDef = (grpc.loadPackageDefinition(def)
   .TimetableService as ServiceClientConstructor).service

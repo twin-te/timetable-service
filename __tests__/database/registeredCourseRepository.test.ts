@@ -6,6 +6,7 @@ import { CourseMethod, Day, Module } from '../../src/database/type'
 import clone from 'clone'
 import { clearDB } from './_cleardb'
 import { deepContaining } from '../_deepContaining'
+import { QueryFailedError } from 'typeorm'
 
 const userId = v4()
 const tags = [
@@ -47,6 +48,14 @@ test('create', async () => {
   expect(res).toEqual(deepContaining(data))
 })
 
+test('duplicate courseId', () => {
+  // courseIdとuserIdがダブったデータ
+  const duplicateData = clone(data)[0]
+  duplicateData.id = v4()
+  return expect(
+    registeredCourseRepository.create([duplicateData])
+  ).rejects.toThrow(QueryFailedError)
+})
 test('read', async () => {
   const res = await registeredCourseRepository.read(userId, 2020)
   expect(res.length).toBe(data.length)

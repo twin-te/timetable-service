@@ -18,6 +18,7 @@ import tagRepository from '../../src/database/tagRepository'
 import { Status } from '@grpc/grpc-js/build/src/constants'
 import { grpcCourseToEntity } from '../../src/grpc/converter'
 import { wrapNullableObject } from '../../src/grpc/nullable'
+import { QueryFailedError } from 'typeorm'
 
 jest.mock('../../src/database/registeredCourseRepository')
 jest.mock('../../src/database/tagRepository')
@@ -189,6 +190,23 @@ describe('createRegisteredCourses', () => {
         done()
       }
     )
+  })
+
+  test('duplicate key', (done) => {
+    mocked(registeredCourseRepository.create).mockImplementation(() => {
+      throw new QueryFailedError(
+        '',
+        undefined,
+        'duplicate key value violates unique constraint'
+      )
+    })
+    client.createRegisteredCourses({}, (err, res) => {
+      expect(err?.code).toBe(Status.INVALID_ARGUMENT)
+      expect(err?.message).toMatch(
+        /duplicate key value violates unique constraint/
+      )
+      done()
+    })
   })
 
   test('unexpected error!', (done) => {

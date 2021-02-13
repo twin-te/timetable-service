@@ -15,6 +15,7 @@ import tagRepository from '../database/tagRepository'
 import registeredCourseRepository from '../database/registeredCourseRepository'
 import { entityToGrpcCourse, grpcCourseToEntity } from './converter'
 import { Status } from '@grpc/grpc-js/build/src/constants'
+import { QueryFailedError } from 'typeorm'
 
 /**
  * TimetableServiceの実装
@@ -56,7 +57,12 @@ export const timetableService: GrpcServer<TimetableService> = {
         })
       )
     } catch (e) {
-      callback(e)
+      if (
+        e instanceof QueryFailedError &&
+        e.message.includes('duplicate key value violates unique constraint')
+      )
+        callback(Object.assign(e, { code: Status.INVALID_ARGUMENT }))
+      else callback(e)
     }
   },
   async createTags({ request }, callback) {
