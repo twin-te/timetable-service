@@ -91,5 +91,5 @@ export function entityToGrpcCourse(
 }
 
 function hasValue(o: any): boolean {
-  return o !== null || typeof o !== 'undefined'
+  return o !== null && typeof o !== 'undefined'
 }

@@ -57,9 +57,10 @@ export function unwrapNullableObject<T extends { [key: string]: any }>(
  * @param v
  */
 function wrapNullable<T>(v: T | null): Nullable<T> {
+  const hasValue = v !== null && typeof v !== 'undefined'
   return {
-    hasValue: v !== null && typeof v !== 'undefined',
-    value: v,
+    hasValue,
+    value: hasValue ? v : null,
   }
 }
 
