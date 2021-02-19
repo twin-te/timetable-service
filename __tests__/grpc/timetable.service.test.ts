@@ -12,16 +12,32 @@ import {
 import { GrpcClient } from '../../src/grpc/types/type'
 import { v4 } from 'uuid'
 import { mocked } from 'ts-jest/utils'
-import registeredCourseRepository from '../../src/database/registeredCourseRepository'
 import { deepContaining } from '../_deepContaining'
-import tagRepository from '../../src/database/tagRepository'
 import { Status } from '@grpc/grpc-js/build/src/constants'
 import { grpcCourseToEntity } from '../../src/grpc/converter'
 import { wrapNullableObject } from '../../src/grpc/nullable'
-import { QueryFailedError } from 'typeorm'
+import {
+  AlreadyExistError,
+  InvalidArgumentError,
+  NotFoundError,
+} from '../../src/error'
+import { getRegisteredCoursesUseCase } from '../../src/usecase/getRegisteredCourses'
+import { getTagsUseCase } from '../../src/usecase/getTags'
+import { createRegisteredCoursesUseCase } from '../../src/usecase/createRegisteredCourses'
+import { createTagsUseCase } from '../../src/usecase/createTags'
+import { updateRegisteredCourseUseCase } from '../../src/usecase/updateRegisteredCourses'
+import { updateTagsUseCase } from '../../src/usecase/updateTags'
+import { deleteRegisteredCoursesUseCase } from '../../src/usecase/deleteRegisteredCourses'
+import { deleteTagsUseCase } from '../../src/usecase/deleteTags'
 
-jest.mock('../../src/database/registeredCourseRepository')
-jest.mock('../../src/database/tagRepository')
+jest.mock('../../src/usecase/createRegisteredCourses')
+jest.mock('../../src/usecase/createTags')
+jest.mock('../../src/usecase/updateRegisteredCourses')
+jest.mock('../../src/usecase/updateTags')
+jest.mock('../../src/usecase/getRegisteredCourses')
+jest.mock('../../src/usecase/getTags')
+jest.mock('../../src/usecase/deleteRegisteredCourses')
+jest.mock('../../src/usecase/deleteTags')
 
 const def = protoLoader.loadSync(
   ['TimetableService.proto', 'Nullable.proto', 'Message.proto'].map((p) =>
@@ -81,20 +97,22 @@ const tags: ITagWithoutId[] = [{ userId, name: 'test tag' }]
 
 describe('getRegisteredCourses', () => {
   test('getRegisteredCourses', (done) => {
-    mocked(registeredCourseRepository.read).mockImplementation(async (u, y) => {
-      expect(u).toBe(userId)
-      expect(y).toBe(2020)
-      // @ts-ignore
-      return grpcCourseToEntity(courses).map(({ tags, ...cc }) => ({
-        ...cc,
-        tags: tags.map((t) => ({
-          id: t.id,
-          userId: cc.userId,
-          name: 'tag name',
-          courses: [],
-        })),
-      }))
-    })
+    mocked(getRegisteredCoursesUseCase).mockImplementation(
+      async ({ userId, year }) => {
+        expect(userId).toBe(userId)
+        expect(year).toBe(2020)
+        // @ts-ignore
+        return grpcCourseToEntity(courses).map(({ tags, ...cc }) => ({
+          ...cc,
+          tags: tags.map((t) => ({
+            id: t.id,
+            userId: cc.userId,
+            name: 'tag name',
+            courses: [],
+          })),
+        }))
+      }
+    )
     client.getRegisteredCourses({ year: 2020, userId }, (err, res) => {
       expect(err).toBeNull()
       expect(res?.courses).toEqual(deepContaining(courses))
@@ -103,9 +121,7 @@ describe('getRegisteredCourses', () => {
   })
 
   test('unexpected error', (done) => {
-    mocked(registeredCourseRepository.read).mockImplementation(
-      throwUnexpectedError
-    )
+    mocked(getRegisteredCoursesUseCase).mockImplementation(throwUnexpectedError)
     client.getRegisteredCourses({ year: 2020, userId }, (err, res) => {
       expect(err).toBeTruthy()
       done()
@@ -116,8 +132,8 @@ describe('getRegisteredCourses', () => {
 describe('getTags', () => {
   test('getTags', (done) => {
     // @ts-ignore
-    mocked(tagRepository.read).mockImplementation(async (u) => {
-      expect(u).toBe(userId)
+    mocked(getTagsUseCase).mockImplementation(async (u) => {
+      expect(u.userId).toBe(userId)
       return tags.map((t) => ({ ...t, id: v4(), courses: [] }))
     })
     client.getTags({ userId }, (err, res) => {
@@ -128,7 +144,7 @@ describe('getTags', () => {
   })
 
   test('unexpected error', (done) => {
-    mocked(tagRepository.read).mockImplementation(throwUnexpectedError)
+    mocked(getTagsUseCase).mockImplementation(throwUnexpectedError)
     client.getTags({ userId }, (err, res) => {
       expect(err).toBeTruthy()
       done()
@@ -139,7 +155,7 @@ describe('getTags', () => {
 describe('createRegisteredCourses', () => {
   test('createRegisteredCourses', (done) => {
     // @ts-ignore
-    mocked(registeredCourseRepository.create).mockImplementation(async (c) => {
+    mocked(createRegisteredCoursesUseCase).mockImplementation(async (c) => {
       return c.map(({ tags, ...cc }) => ({
         ...cc,
         tags: tags.map((t) => ({
@@ -164,26 +180,12 @@ describe('createRegisteredCourses', () => {
   })
 
   test('invalid argument', (done) => {
-    mocked(registeredCourseRepository.create).mockImplementation(async () => [])
+    mocked(createRegisteredCoursesUseCase).mockImplementation(async () => {
+      throw new InvalidArgumentError()
+    })
     client.createRegisteredCourses(
       {
-        courses: [
-          // @ts-ignore
-          wrapNullableObject({ userId }, [
-            // @ts-ignore
-            'name',
-            // @ts-ignore
-            'courseId',
-            // @ts-ignore
-            'instructor',
-            // @ts-ignore
-            'credit',
-            // @ts-ignore
-            'methods',
-            // @ts-ignore
-            'schedules',
-          ]),
-        ],
+        courses: [],
       },
       (err, res) => {
         expect(err?.code).toBe(Status.INVALID_ARGUMENT)
@@ -193,24 +195,18 @@ describe('createRegisteredCourses', () => {
   })
 
   test('duplicate key', (done) => {
-    mocked(registeredCourseRepository.create).mockImplementation(() => {
-      throw new QueryFailedError(
-        '',
-        undefined,
-        'duplicate key value violates unique constraint'
-      )
+    mocked(createRegisteredCoursesUseCase).mockImplementation(() => {
+      throw new AlreadyExistError('この講義は既に登録されています')
     })
     client.createRegisteredCourses({}, (err, res) => {
-      expect(err?.code).toBe(Status.INVALID_ARGUMENT)
-      expect(err?.message).toMatch(
-        /duplicate key value violates unique constraint/
-      )
+      expect(err?.code).toBe(Status.ALREADY_EXISTS)
+      expect(err?.message).toMatch(/この講義は既に登録されています/)
       done()
     })
   })
 
   test('unexpected error!', (done) => {
-    mocked(registeredCourseRepository.create).mockImplementation(
+    mocked(createRegisteredCoursesUseCase).mockImplementation(
       throwUnexpectedError
     )
 
@@ -229,7 +225,7 @@ describe('createRegisteredCourses', () => {
 describe('createTags', () => {
   test('createTags', (done) => {
     // @ts-ignore
-    mocked(tagRepository.create).mockImplementation(async (t) => t)
+    mocked(createTagsUseCase).mockImplementation(async (t) => t)
     client.createTags({ tags }, (err, res) => {
       expect(err).toBeNull()
       expect(res?.tags).toEqual(deepContaining(tags))
@@ -238,7 +234,7 @@ describe('createTags', () => {
   })
 
   test('unexpected error', (done) => {
-    mocked(tagRepository.create).mockImplementation(throwUnexpectedError)
+    mocked(createTagsUseCase).mockImplementation(throwUnexpectedError)
     client.createTags({ tags }, (err, res) => {
       expect(err).toBeTruthy()
       done()
@@ -249,7 +245,7 @@ describe('createTags', () => {
 describe('updateRegisteredCourse', () => {
   test('updateRegisteredCourse', (done) => {
     // @ts-ignore
-    mocked(registeredCourseRepository.update).mockImplementation(async (c) => {
+    mocked(updateRegisteredCourseUseCase).mockImplementation(async (c) => {
       return c.map(({ tags, ...cc }) => ({
         ...cc,
         tags: tags.map((t) => ({
@@ -273,9 +269,9 @@ describe('updateRegisteredCourse', () => {
   })
 
   test('updateRegisteredCourse failed', (done) => {
-    mocked(registeredCourseRepository.update).mockImplementation(
-      async (c) => undefined
-    )
+    mocked(updateRegisteredCourseUseCase).mockImplementation(async (c) => {
+      throw new NotFoundError('指定された講義は見つかりませんでした')
+    })
     client.updateRegisteredCourses(
       {
         courses,
@@ -288,7 +284,7 @@ describe('updateRegisteredCourse', () => {
   })
 
   test('unexpected error', (done) => {
-    mocked(registeredCourseRepository.update).mockImplementation(
+    mocked(updateRegisteredCourseUseCase).mockImplementation(
       throwUnexpectedError
     )
     client.updateRegisteredCourses(
@@ -307,7 +303,7 @@ describe('updateTags', () => {
   test('updateTags', (done) => {
     const tags: ITagWithoutId[] = [{ userId, name: 'test tag' }]
     // @ts-ignore
-    mocked(tagRepository.update).mockImplementation(async (t) => t)
+    mocked(updateTagsUseCase).mockImplementation(async (t) => t)
     client.updateTags({ tags }, (err, res) => {
       expect(err).toBeNull()
       expect(res?.tags).toEqual(deepContaining(tags))
@@ -318,7 +314,9 @@ describe('updateTags', () => {
   test('updateTags failed', (done) => {
     const tags: ITagWithoutId[] = [{ userId, name: 'test tag' }]
     // @ts-ignore
-    mocked(tagRepository.update).mockImplementation(async (t) => undefined)
+    mocked(updateTagsUseCase).mockImplementation(async (t) => {
+      throw new NotFoundError('指定されたタグは見つかりませんでした')
+    })
     client.updateTags({ tags }, (err, res) => {
       expect(err?.code).toBe(Status.NOT_FOUND)
       done()
@@ -326,7 +324,7 @@ describe('updateTags', () => {
   })
 
   test('unexpected error', (done) => {
-    mocked(tagRepository.update).mockImplementation(throwUnexpectedError)
+    mocked(updateTagsUseCase).mockImplementation(throwUnexpectedError)
     client.updateTags({ tags }, (err, res) => {
       expect(err?.code).toBeTruthy()
       done()
@@ -337,9 +335,8 @@ describe('updateTags', () => {
 describe('deleteRegisteredCourse', () => {
   test('deleteRegisteredCourse', (done) => {
     const ids = [v4(), v4()]
-    mocked(registeredCourseRepository.delete).mockImplementation(async (i) => {
+    mocked(deleteRegisteredCoursesUseCase).mockImplementation(async (i) => {
       expect(i).toEqual(deepContaining(ids))
-      return true
     })
 
     client.deleteRegisteredCourses({ ids }, (err, res) => {
@@ -350,9 +347,9 @@ describe('deleteRegisteredCourse', () => {
 
   test('deleteRegisteredCourse failed', (done) => {
     const ids = [v4(), v4()]
-    mocked(registeredCourseRepository.delete).mockImplementation(
-      async () => false
-    )
+    mocked(deleteRegisteredCoursesUseCase).mockImplementation(async () => {
+      throw new NotFoundError('指定された講義は見つかりませんでした')
+    })
 
     client.deleteRegisteredCourses({ ids }, (err, res) => {
       expect(err?.code).toBe(Status.NOT_FOUND)
@@ -361,7 +358,7 @@ describe('deleteRegisteredCourse', () => {
   })
   test('unexpected error', (done) => {
     const ids = [v4(), v4()]
-    mocked(registeredCourseRepository.delete).mockImplementation(
+    mocked(deleteRegisteredCoursesUseCase).mockImplementation(
       throwUnexpectedError
     )
     client.deleteRegisteredCourses({ ids }, (err, res) => {
@@ -374,9 +371,8 @@ describe('deleteRegisteredCourse', () => {
 describe('deleteTags', () => {
   test('deleteTags', (done) => {
     const ids = [v4(), v4()]
-    mocked(tagRepository.delete).mockImplementation(async (i) => {
+    mocked(deleteTagsUseCase).mockImplementation(async (i) => {
       expect(i).toEqual(deepContaining(ids))
-      return true
     })
 
     client.deleteTags({ ids }, (err, res) => {
@@ -387,7 +383,9 @@ describe('deleteTags', () => {
 
   test('deleteTags failed', (done) => {
     const ids = [v4(), v4()]
-    mocked(tagRepository.delete).mockImplementation(async () => false)
+    mocked(deleteTagsUseCase).mockImplementation(async () => {
+      throw new NotFoundError('指定されたタグは見つかりませんでした')
+    })
 
     client.deleteTags({ ids }, (err, res) => {
       expect(err?.code).toBe(Status.NOT_FOUND)
@@ -397,7 +395,7 @@ describe('deleteTags', () => {
 
   test('unexpected error', (done) => {
     const ids = [v4(), v4()]
-    mocked(tagRepository.delete).mockImplementation(throwUnexpectedError)
+    mocked(deleteTagsUseCase).mockImplementation(throwUnexpectedError)
 
     client.deleteTags({ ids }, (err, res) => {
       expect(err?.code).toBeTruthy()
