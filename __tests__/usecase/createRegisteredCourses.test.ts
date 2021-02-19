@@ -2,7 +2,6 @@ import clone from 'clone'
 import { Module, CourseMethod, Day } from '../../src/database/type'
 import { v4 } from 'uuid'
 import { connectDatabase, disconnectDatabase } from '../../src/database'
-import tagRepository from '../../src/database/tagRepository'
 
 import { AlreadyExistError, InvalidArgumentError } from '../../src/error'
 import { createRegisteredCoursesUseCase } from '../../src/usecase/createRegisteredCourses'
