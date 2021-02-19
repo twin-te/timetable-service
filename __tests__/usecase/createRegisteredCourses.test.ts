@@ -17,9 +17,8 @@ const tags = [
 ]
 
 const data = [
-  { id: v4(), userId, year: 2020, courseId: v4(), tags: [] },
+  { userId, year: 2020, courseId: v4(), tags: [] },
   {
-    id: v4(),
     userId,
     year: 2020,
     name: 'custom course name',
@@ -53,7 +52,6 @@ test('正しいデータで作成できる', async () => {
 test('同じ講義を登録しようとするとエラーになる', () => {
   // courseIdとuserIdがダブったデータ
   const duplicateData = clone(data)[0]
-  duplicateData.id = v4()
   return expect(
     createRegisteredCoursesUseCase([duplicateData])
   ).rejects.toThrow(AlreadyExistError)

@@ -17,7 +17,17 @@ const tags = [
 ]
 
 const data = [
-  { id: v4(), userId, year: 2020, courseId: v4(), tags: [] },
+  {
+    id: v4(),
+    userId,
+    year: 2020,
+    courseId: v4(),
+    tags: [],
+    memo: 'memo',
+    attendance: 1,
+    absence: 2,
+    late: 3,
+  },
   {
     id: v4(),
     userId,
@@ -35,6 +45,10 @@ const data = [
       },
     ],
     tags: [{ id: tags[0].id }],
+    memo: 'memomo',
+    attendance: 1,
+    absence: 2,
+    late: 3,
   },
 ]
 
@@ -64,7 +78,19 @@ test('無効なデータはエラーになる', () => {
 })
 
 test('存在しないidでエラーになる', () => {
-  const newData = [{ id: v4(), userId, year: 2020, courseId: v4(), tags: [] }]
+  const newData = [
+    {
+      id: v4(),
+      userId,
+      year: 2020,
+      courseId: v4(),
+      tags: [],
+      memo: '',
+      attendance: 1,
+      absence: 2,
+      late: 3,
+    },
+  ]
   return expect(updateRegisteredCourseUseCase(newData)).rejects.toThrow(
     NotFoundError
   )
