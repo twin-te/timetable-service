@@ -1,4 +1,5 @@
 import { getConnection, QueryFailedError } from 'typeorm'
+import { v4 } from 'uuid'
 import { RegisteredCourse } from '../database/model/registeredCourse'
 import { CourseMethod, Day, Module } from '../database/type'
 import { AlreadyExistError, InvalidArgumentError } from '../error'
@@ -38,7 +39,18 @@ export async function createRegisteredCoursesUseCase(courses: Input[]) {
   })
   try {
     const repo = getConnection().getRepository(RegisteredCourse)
-    const res = await repo.save(repo.create(courses))
+    const res = await repo.save(
+      repo.create(
+        courses.map((c) => ({
+          ...c,
+          id: v4(),
+          memo: '',
+          attendance: 0,
+          absence: 0,
+          late: 0,
+        }))
+      )
+    )
     return res
   } catch (e) {
     if (

@@ -25,6 +25,10 @@ type Input = {
       }[]
     | null
   tags: { id: string }[]
+  memo: string
+  attendance: number
+  absence: number
+  late: number
 }
 
 export async function updateRegisteredCourseUseCase(courses: Input[]) {

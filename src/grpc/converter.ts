@@ -34,13 +34,24 @@ function grpcScheduleToEntity(
     : null
 }
 
-export function grpcCourseToEntity(
-  courses: DeepRequired<IRegisteredCourseWithoutId | IRegisteredCourse>[]
+export function grpcCourseToEntity(courses: DeepRequired<IRegisteredCourse>[]) {
+  return courses
+    .map(unwrapNullableObject)
+    .map(({ schedules, methods, ...c }) => ({
+      schedules: grpcScheduleToEntity(schedules),
+      methods: methods
+        ? methods.map((m) => Object.values(CourseMethod)[m])
+        : null,
+      ...c,
+    }))
+}
+
+export function grpcCourseToEntityWithoutId(
+  courses: DeepRequired<IRegisteredCourseWithoutId>[]
 ) {
   return courses
     .map(unwrapNullableObject)
     .map(({ schedules, methods, ...c }) => ({
-      id: 'id' in c ? c.id : v4(),
       schedules: grpcScheduleToEntity(schedules),
       methods: methods
         ? methods.map((m) => Object.values(CourseMethod)[m])

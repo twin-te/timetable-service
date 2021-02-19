@@ -13,6 +13,7 @@ import {
 import {
   entityToGrpcCourse,
   grpcCourseToEntity,
+  grpcCourseToEntityWithoutId,
   toGrpcError,
 } from './converter'
 import { Status } from '@grpc/grpc-js/build/src/constants'
@@ -53,7 +54,7 @@ export const timetableService: GrpcServer<TimetableService> = {
   async createRegisteredCourses({ request }, callback) {
     try {
       const courses = await createRegisteredCoursesUseCase(
-        grpcCourseToEntity(request.courses)
+        grpcCourseToEntityWithoutId(request.courses)
       )
       callback(
         null,
