@@ -2,7 +2,9 @@
  * grpcのメッセージを変換するユーティリティ
  */
 
+import { Metadata, StatusObject } from '@grpc/grpc-js'
 import { Status } from '@grpc/grpc-js/build/src/constants'
+import { ServerErrorResponse } from '@grpc/grpc-js/build/src/server-call'
 import { v4 } from 'uuid'
 import {
   ICourseSchedule,
@@ -12,6 +14,11 @@ import {
 } from '../../generated'
 import { RegisteredCourse } from '../database/model/registeredCourse'
 import { CourseMethod, CourseSchedule, Day, Module } from '../database/type'
+import {
+  AlreadyExistError,
+  InvalidArgumentError,
+  NotFoundError,
+} from '../error'
 import { unwrapNullableObject, wrapNullableObject } from './nullable'
 import { DeepRequired } from './types/type'
 
@@ -40,21 +47,6 @@ export function grpcCourseToEntity(
         : null,
       ...c,
     }))
-    .map((c) => {
-      if (
-        !c.courseId &&
-        (!hasValue(c.name) ||
-          !hasValue(c.instructor) ||
-          !hasValue(c.credit) ||
-          !hasValue(c.methods) ||
-          !hasValue(c.schedules))
-      )
-        throw Object.assign(
-          new Error('nullが許可されるのはベース講義がある場合のみです'),
-          { code: Status.INVALID_ARGUMENT }
-        )
-      else return c
-    })
 }
 
 function entityToGrpcSchedule(
@@ -90,6 +82,28 @@ export function entityToGrpcCourse(
     )
 }
 
-function hasValue(o: any): boolean {
-  return o !== null && typeof o !== 'undefined'
+export function toGrpcError(
+  e: Error
+): Partial<StatusObject> | ServerErrorResponse {
+  if (e instanceof NotFoundError)
+    return Object.assign(e, {
+      code: Status.NOT_FOUND,
+      metadata: makeMetadata({ resources: e.resources }),
+    })
+  else if (e instanceof InvalidArgumentError)
+    return Object.assign(e, {
+      code: Status.INVALID_ARGUMENT,
+      metadata: makeMetadata({ args: e.args }),
+    })
+  else if (e instanceof AlreadyExistError)
+    return Object.assign(e, {
+      code: Status.ALREADY_EXISTS,
+    })
+  else return Object.assign(e, { code: Status.UNKNOWN })
+}
+
+function makeMetadata(obj: any): Metadata {
+  const metadata = new Metadata()
+  Object.keys(obj).forEach((k) => metadata.add(k, obj[k]))
+  return metadata
 }

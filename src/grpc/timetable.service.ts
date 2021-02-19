@@ -10,12 +10,20 @@ import {
   UpdateRegisteredCoursesResponse,
   UpdateTagsResponse,
 } from '../../generated/index'
-import { v4 } from 'uuid'
-import tagRepository from '../database/tagRepository'
-import registeredCourseRepository from '../database/registeredCourseRepository'
-import { entityToGrpcCourse, grpcCourseToEntity } from './converter'
+import {
+  entityToGrpcCourse,
+  grpcCourseToEntity,
+  toGrpcError,
+} from './converter'
 import { Status } from '@grpc/grpc-js/build/src/constants'
-import { QueryFailedError } from 'typeorm'
+import { getRegisteredCoursesUseCase } from '../usecase/getRegisteredCourses'
+import { getTagsUseCase } from '../usecase/getTags'
+import { createRegisteredCoursesUseCase } from '../usecase/createRegisteredCourses'
+import { createTagsUseCase } from '../usecase/createTags'
+import { updateRegisteredCourseUseCase } from '../usecase/updateRegisteredCourses'
+import { updateTagsUseCase } from '../usecase/updateTags'
+import { deleteRegisteredCoursesUseCase } from '../usecase/deleteRegisteredCourses'
+import { deleteTagsUseCase } from '../usecase/deleteTags'
 
 /**
  * TimetableServiceの実装
@@ -23,10 +31,7 @@ import { QueryFailedError } from 'typeorm'
 export const timetableService: GrpcServer<TimetableService> = {
   async getRegisteredCourses({ request }, callback) {
     try {
-      const courses = await registeredCourseRepository.read(
-        request.userId,
-        request.year
-      )
+      const courses = await getRegisteredCoursesUseCase(request)
       callback(
         null,
         GetRegisteredCoursesResponse.create({
@@ -34,20 +39,20 @@ export const timetableService: GrpcServer<TimetableService> = {
         })
       )
     } catch (e) {
-      callback(e)
+      callback(toGrpcError(e))
     }
   },
   async getTags({ request }, callback) {
     try {
-      const tags = await tagRepository.read(request.userId)
+      const tags = await getTagsUseCase(request)
       callback(null, GetTagsResponse.create({ tags }))
     } catch (e) {
-      callback(e)
+      callback(toGrpcError(e))
     }
   },
   async createRegisteredCourses({ request }, callback) {
     try {
-      const courses = await registeredCourseRepository.create(
+      const courses = await createRegisteredCoursesUseCase(
         grpcCourseToEntity(request.courses)
       )
       callback(
@@ -57,19 +62,12 @@ export const timetableService: GrpcServer<TimetableService> = {
         })
       )
     } catch (e) {
-      if (
-        e instanceof QueryFailedError &&
-        e.message.includes('duplicate key value violates unique constraint')
-      )
-        callback(Object.assign(e, { code: Status.INVALID_ARGUMENT }))
-      else callback(e)
+      callback(toGrpcError(e))
     }
   },
   async createTags({ request }, callback) {
     try {
-      const tags = await tagRepository.create(
-        request.tags.map((t) => ({ ...t, id: v4() }))
-      )
+      const tags = await createTagsUseCase(request.tags)
       callback(
         null,
         CreateTagsResponse.create({
@@ -77,12 +75,12 @@ export const timetableService: GrpcServer<TimetableService> = {
         })
       )
     } catch (e) {
-      callback(e)
+      callback(toGrpcError(e))
     }
   },
   async updateRegisteredCourses({ request }, callback) {
     try {
-      const courses = await registeredCourseRepository.update(
+      const courses = await updateRegisteredCourseUseCase(
         grpcCourseToEntity(request.courses)
       )
       if (!courses) callback({ code: Status.NOT_FOUND })
@@ -94,12 +92,12 @@ export const timetableService: GrpcServer<TimetableService> = {
           })
         )
     } catch (e) {
-      callback(e)
+      callback(toGrpcError(e))
     }
   },
   async updateTags({ request }, callback) {
     try {
-      const tags = await tagRepository.update(request.tags)
+      const tags = await updateTagsUseCase(request.tags)
       if (!tags) callback({ code: Status.NOT_FOUND })
       else
         callback(
@@ -109,25 +107,23 @@ export const timetableService: GrpcServer<TimetableService> = {
           })
         )
     } catch (e) {
-      callback(e)
+      callback(toGrpcError(e))
     }
   },
   async deleteRegisteredCourses({ request }, callback) {
     try {
-      const success = await registeredCourseRepository.delete(request.ids)
-      if (!success) callback({ code: Status.NOT_FOUND })
-      else callback(null, DeleteRegisteredCoursesResponse.create({}))
+      await deleteRegisteredCoursesUseCase(request.ids)
+      callback(null, DeleteRegisteredCoursesResponse.create({}))
     } catch (e) {
-      callback(e)
+      callback(toGrpcError(e))
     }
   },
   async deleteTags({ request }, callback) {
     try {
-      const success = await tagRepository.delete(request.ids)
-      if (!success) callback({ code: Status.NOT_FOUND })
-      else callback(null, DeleteTagsResponse.create({}))
+      await deleteTagsUseCase(request.ids)
+      callback(null, DeleteTagsResponse.create({}))
     } catch (e) {
-      callback(e)
+      callback(toGrpcError(e))
     }
   },
 }
