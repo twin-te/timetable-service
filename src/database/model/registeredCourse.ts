@@ -93,4 +93,28 @@ export class RegisteredCourse {
     },
   })
   tags!: Tag[]
+
+  @Column({
+    name: 'memo',
+    type: 'text',
+  })
+  memo!: string
+
+  @Column({
+    name: 'attendance',
+    type: 'integer',
+  })
+  attendance!: number
+
+  @Column({
+    name: 'absence',
+    type: 'integer',
+  })
+  absence!: number
+
+  @Column({
+    name: 'late',
+    type: 'integer',
+  })
+  late!: number
 }
