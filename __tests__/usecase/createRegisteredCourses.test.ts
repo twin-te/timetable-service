@@ -7,7 +7,7 @@ import { AlreadyExistError, InvalidArgumentError } from '../../src/error'
 import { createRegisteredCoursesUseCase } from '../../src/usecase/createRegisteredCourses'
 import { clearDB } from '../database/_cleardb'
 import { deepContaining } from '../_deepContaining'
-import { getConnection, getRepository } from 'typeorm'
+import { getConnection } from 'typeorm'
 import { Tag } from '../../src/database/model/tag'
 
 const userId = v4()

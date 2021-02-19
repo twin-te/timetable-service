@@ -5,7 +5,6 @@
 import { Metadata, StatusObject } from '@grpc/grpc-js'
 import { Status } from '@grpc/grpc-js/build/src/constants'
 import { ServerErrorResponse } from '@grpc/grpc-js/build/src/server-call'
-import { v4 } from 'uuid'
 import {
   ICourseSchedule,
   IRegisteredCourse,

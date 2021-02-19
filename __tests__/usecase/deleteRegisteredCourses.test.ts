@@ -1,15 +1,12 @@
-import clone from 'clone'
 import { getConnection } from 'typeorm'
 import { v4 } from 'uuid'
 import { connectDatabase, disconnectDatabase } from '../../src/database'
 import { RegisteredCourse } from '../../src/database/model/registeredCourse'
 import { Tag } from '../../src/database/model/tag'
 import { CourseMethod, Day, Module } from '../../src/database/type'
-import { InvalidArgumentError, NotFoundError } from '../../src/error'
+import { NotFoundError } from '../../src/error'
 import { deleteRegisteredCoursesUseCase } from '../../src/usecase/deleteRegisteredCourses'
-import { updateRegisteredCourseUseCase } from '../../src/usecase/updateRegisteredCourses'
 import { clearDB } from '../database/_cleardb'
-import { deepContaining } from '../_deepContaining'
 
 const userId = v4()
 const tags = [
