@@ -113,7 +113,7 @@ export const timetableService: GrpcServer<TimetableService> = {
   },
   async deleteRegisteredCourses({ request }, callback) {
     try {
-      await deleteRegisteredCoursesUseCase(request.ids)
+      await deleteRegisteredCoursesUseCase(request)
       callback(null, DeleteRegisteredCoursesResponse.create({}))
     } catch (e) {
       callback(toGrpcError(e))
@@ -121,7 +121,7 @@ export const timetableService: GrpcServer<TimetableService> = {
   },
   async deleteTags({ request }, callback) {
     try {
-      await deleteTagsUseCase(request.ids)
+      await deleteTagsUseCase(request)
       callback(null, DeleteTagsResponse.create({}))
     } catch (e) {
       callback(toGrpcError(e))

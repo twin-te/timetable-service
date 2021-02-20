@@ -10,7 +10,9 @@ type Input = {
 
 export async function updateTagsUseCase(tags: Input[]) {
   const repository = getConnection().getRepository(Tag)
-  const target = await repository.findByIds(tags.map((t) => t.id))
+  const target = await repository.find({
+    where: tags.map(({ id, userId }) => ({ id, userId })),
+  })
   if (target.length !== tags.length)
     throw new NotFoundError(
       '指定されたタグが見つかりません',

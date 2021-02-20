@@ -23,12 +23,20 @@ beforeAll(async () => {
 
 test('正しく削除できる', () => {
   return expect(
-    deleteTagsUseCase(data.map((t) => t.id))
+    deleteTagsUseCase({ userId, ids: data.map((t) => t.id) })
   ).resolves.toBeUndefined()
 })
 
 test('存在しないデータでエラーになる', () => {
-  return expect(deleteTagsUseCase([v4()])).rejects.toThrow(NotFoundError)
+  return expect(deleteTagsUseCase({ userId, ids: [v4()] })).rejects.toThrow(
+    NotFoundError
+  )
+})
+
+test('存在しないデータでエラーになる', () => {
+  return expect(
+    deleteTagsUseCase({ userId: v4(), ids: data.map((t) => t.id) })
+  ).rejects.toThrow(NotFoundError)
 })
 
 afterAll(disconnectDatabase)

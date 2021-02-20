@@ -60,14 +60,20 @@ beforeAll(async () => {
 
 test('既に存在するデータを正しく削除できる', () => {
   return expect(
-    deleteRegisteredCoursesUseCase(data.map((c) => c.id))
+    deleteRegisteredCoursesUseCase({ userId, ids: data.map((c) => c.id) })
   ).resolves.toBeUndefined()
 })
 
 test('存在しないデータはエラーになる', () => {
-  return expect(deleteRegisteredCoursesUseCase([v4()])).rejects.toThrow(
-    NotFoundError
-  )
+  return expect(
+    deleteRegisteredCoursesUseCase({ userId, ids: [v4()] })
+  ).rejects.toThrow(NotFoundError)
+})
+
+test('存在しないデータはエラーになる', () => {
+  return expect(
+    deleteRegisteredCoursesUseCase({ userId: v4(), ids: data.map((c) => c.id) })
+  ).rejects.toThrow(NotFoundError)
 })
 
 afterAll(disconnectDatabase)

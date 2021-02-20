@@ -47,7 +47,9 @@ export async function updateRegisteredCourseUseCase(courses: Input[]) {
   })
   try {
     const repository = getConnection().getRepository(RegisteredCourse)
-    const target = await repository.findByIds(courses.map((c) => c.id))
+    const target = await repository.find({
+      where: courses.map(({ id, userId }) => ({ id, userId })),
+    })
     if (target.length !== courses.length)
       throw new NotFoundError(
         '指定された講義は見つかりませんでした',

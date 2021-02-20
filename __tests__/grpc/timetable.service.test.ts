@@ -336,10 +336,11 @@ describe('deleteRegisteredCourse', () => {
   test('deleteRegisteredCourse', (done) => {
     const ids = [v4(), v4()]
     mocked(deleteRegisteredCoursesUseCase).mockImplementation(async (i) => {
-      expect(i).toEqual(deepContaining(ids))
+      expect(i.ids).toEqual(deepContaining(ids))
+      expect(i.userId).toEqual(userId)
     })
 
-    client.deleteRegisteredCourses({ ids }, (err, res) => {
+    client.deleteRegisteredCourses({ userId, ids }, (err, res) => {
       expect(err).toBeNull()
       done()
     })
@@ -351,7 +352,7 @@ describe('deleteRegisteredCourse', () => {
       throw new NotFoundError('指定された講義は見つかりませんでした')
     })
 
-    client.deleteRegisteredCourses({ ids }, (err, res) => {
+    client.deleteRegisteredCourses({ userId, ids }, (err, res) => {
       expect(err?.code).toBe(Status.NOT_FOUND)
       done()
     })
@@ -361,7 +362,7 @@ describe('deleteRegisteredCourse', () => {
     mocked(deleteRegisteredCoursesUseCase).mockImplementation(
       throwUnexpectedError
     )
-    client.deleteRegisteredCourses({ ids }, (err, res) => {
+    client.deleteRegisteredCourses({ userId, ids }, (err, res) => {
       expect(err?.code).toBeTruthy()
       done()
     })
@@ -372,10 +373,11 @@ describe('deleteTags', () => {
   test('deleteTags', (done) => {
     const ids = [v4(), v4()]
     mocked(deleteTagsUseCase).mockImplementation(async (i) => {
-      expect(i).toEqual(deepContaining(ids))
+      expect(i.ids).toEqual(deepContaining(ids))
+      expect(i.userId).toEqual(userId)
     })
 
-    client.deleteTags({ ids }, (err, res) => {
+    client.deleteTags({ userId, ids }, (err, res) => {
       expect(err).toBeNull()
       done()
     })
@@ -387,7 +389,7 @@ describe('deleteTags', () => {
       throw new NotFoundError('指定されたタグは見つかりませんでした')
     })
 
-    client.deleteTags({ ids }, (err, res) => {
+    client.deleteTags({ userId, ids }, (err, res) => {
       expect(err?.code).toBe(Status.NOT_FOUND)
       done()
     })
@@ -397,7 +399,7 @@ describe('deleteTags', () => {
     const ids = [v4(), v4()]
     mocked(deleteTagsUseCase).mockImplementation(throwUnexpectedError)
 
-    client.deleteTags({ ids }, (err, res) => {
+    client.deleteTags({ userId, ids }, (err, res) => {
       expect(err?.code).toBeTruthy()
       done()
     })

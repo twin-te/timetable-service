@@ -72,12 +72,14 @@ message UpdateTagsResponse {
 
 
 message DeleteRegisteredCoursesRequest {
-  repeated string ids = 1;
+  string userId = 1;
+  repeated string ids = 2;
 }
 message DeleteRegisteredCoursesResponse {}
 
 
 message DeleteTagsRequest {
-  repeated string ids = 1;
+  string userId = 1;
+  repeated string ids = 2;
 }
 message DeleteTagsResponse {}

@@ -2,11 +2,16 @@ import { getConnection } from 'typeorm'
 import { Tag } from '../database/model/tag'
 import { NotFoundError } from '../error'
 
-type Input = string[]
+type Input = {
+  userId: string
+  ids: string[]
+}
 
-export async function deleteTagsUseCase(ids: Input) {
+export async function deleteTagsUseCase({ userId, ids }: Input) {
   const repository = getConnection().getRepository(Tag)
-  const target = await repository.findByIds(ids)
+  const target = await repository.find({
+    where: ids.map((id) => ({ id, userId })),
+  })
   if (target.length !== ids.length)
     throw new NotFoundError(
       '指定されたタグは見つかりませんでした',
