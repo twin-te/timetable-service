@@ -6,7 +6,10 @@ type Input = {
   year: number
 }
 
-export async function getRegisteredCoursesUseCase({ userId, year }: Input) {
+export async function getRegisteredCoursesByYearUseCase({
+  userId,
+  year,
+}: Input) {
   const repository = getConnection().getRepository(RegisteredCourse)
   const res = await repository.find({
     where: { userId, year },

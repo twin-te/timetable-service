@@ -17,7 +17,7 @@ import {
   toGrpcError,
 } from './converter'
 import { Status } from '@grpc/grpc-js/build/src/constants'
-import { getRegisteredCoursesUseCase } from '../usecase/getRegisteredCourses'
+import { getRegisteredCoursesByYearUseCase } from '../usecase/getRegisteredCoursesByYear'
 import { getTagsUseCase } from '../usecase/getTags'
 import { createRegisteredCoursesUseCase } from '../usecase/createRegisteredCourses'
 import { createTagsUseCase } from '../usecase/createTags'
@@ -30,9 +30,9 @@ import { deleteTagsUseCase } from '../usecase/deleteTags'
  * TimetableServiceの実装
  */
 export const timetableService: GrpcServer<TimetableService> = {
-  async getRegisteredCourses({ request }, callback) {
+  async getRegisteredCoursesByYear({ request }, callback) {
     try {
-      const courses = await getRegisteredCoursesUseCase(request)
+      const courses = await getRegisteredCoursesByYearUseCase(request)
       callback(
         null,
         GetRegisteredCoursesResponse.create({

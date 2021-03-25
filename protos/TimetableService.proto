@@ -4,8 +4,10 @@ import "protos/Nullable.proto";
 import "protos/Message.proto";
 
 service TimetableService {
-  /* 指定されたユーザーの登録済み講義を取得する */
-  rpc GetRegisteredCourses(GetRegisteredCoursesRequest) returns (GetRegisteredCoursesResponse);
+  /* 指定された年度とユーザーの登録済み講義を取得する */
+  rpc GetRegisteredCoursesByYear(GetRegisteredCoursesRequest) returns (GetRegisteredCoursesResponse);
+  /* 指定されたidの講義を取得 */
+  /*rpc GetRegisteredCourses(GetRegisteredCourseRequest) returns (GetRegisteredCourseResponse);*/
   /* 指定されたユーザーのタグをすべて取得する */
   rpc GetTags(GetTagsRequest) returns (GetTagsResponse);
   /* 講義を登録する */
@@ -30,6 +32,14 @@ message GetRegisteredCoursesResponse {
   repeated RegisteredCourse courses = 1;
 }
 
+message GetRegisteredCourseRequest {
+  string userId = 1;
+  repeated string ids = 2;
+}
+
+message GetRegisteredCourseResponse {
+  repeated RegisteredCourse courses = 1;
+}
 
 message GetTagsRequest {
   string userId = 1;

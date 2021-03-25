@@ -4,7 +4,7 @@ import { connectDatabase, disconnectDatabase } from '../../src/database'
 import { RegisteredCourse } from '../../src/database/model/registeredCourse'
 import { Tag } from '../../src/database/model/tag'
 import { CourseMethod, Day, Module } from '../../src/database/type'
-import { getRegisteredCoursesUseCase } from '../../src/usecase/getRegisteredCourses'
+import { getRegisteredCoursesByYearUseCase } from '../../src/usecase/getRegisteredCoursesByYear'
 import { clearDB } from '../database/_cleardb'
 import { deepContaining } from '../_deepContaining'
 
@@ -59,18 +59,18 @@ beforeAll(async () => {
 
 test('データが取得できる', () => {
   return expect(
-    getRegisteredCoursesUseCase({ userId, year: 2020 })
+    getRegisteredCoursesByYearUseCase({ userId, year: 2020 })
   ).resolves.toEqual(deepContaining(data))
 })
 
 test('条件に合う講義がない場合は空になる', () => {
   return expect(
-    getRegisteredCoursesUseCase({ userId, year: 2021 })
+    getRegisteredCoursesByYearUseCase({ userId, year: 2021 })
   ).resolves.toEqual([])
 })
 test('条件に合う講義がない場合は空になる', () => {
   return expect(
-    getRegisteredCoursesUseCase({ userId: v4(), year: 2020 })
+    getRegisteredCoursesByYearUseCase({ userId: v4(), year: 2020 })
   ).resolves.toEqual([])
 })
 

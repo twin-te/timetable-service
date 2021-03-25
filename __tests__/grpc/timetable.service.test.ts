@@ -21,7 +21,7 @@ import {
   InvalidArgumentError,
   NotFoundError,
 } from '../../src/error'
-import { getRegisteredCoursesUseCase } from '../../src/usecase/getRegisteredCourses'
+import { getRegisteredCoursesByYearUseCase } from '../../src/usecase/getRegisteredCoursesByYear'
 import { getTagsUseCase } from '../../src/usecase/getTags'
 import { createRegisteredCoursesUseCase } from '../../src/usecase/createRegisteredCourses'
 import { createTagsUseCase } from '../../src/usecase/createTags'
@@ -34,7 +34,7 @@ jest.mock('../../src/usecase/createRegisteredCourses')
 jest.mock('../../src/usecase/createTags')
 jest.mock('../../src/usecase/updateRegisteredCourses')
 jest.mock('../../src/usecase/updateTags')
-jest.mock('../../src/usecase/getRegisteredCourses')
+jest.mock('../../src/usecase/getRegisteredCoursesByYear')
 jest.mock('../../src/usecase/getTags')
 jest.mock('../../src/usecase/deleteRegisteredCourses')
 jest.mock('../../src/usecase/deleteTags')
@@ -97,7 +97,7 @@ const tags: ITagWithoutId[] = [{ userId, name: 'test tag' }]
 
 describe('getRegisteredCourses', () => {
   test('getRegisteredCourses', (done) => {
-    mocked(getRegisteredCoursesUseCase).mockImplementation(
+    mocked(getRegisteredCoursesByYearUseCase).mockImplementation(
       async ({ userId, year }) => {
         expect(userId).toBe(userId)
         expect(year).toBe(2020)
@@ -113,7 +113,7 @@ describe('getRegisteredCourses', () => {
         }))
       }
     )
-    client.getRegisteredCourses({ year: 2020, userId }, (err, res) => {
+    client.getRegisteredCoursesByYear({ year: 2020, userId }, (err, res) => {
       expect(err).toBeNull()
       expect(res?.courses).toEqual(deepContaining(courses))
       done()
@@ -121,8 +121,10 @@ describe('getRegisteredCourses', () => {
   })
 
   test('unexpected error', (done) => {
-    mocked(getRegisteredCoursesUseCase).mockImplementation(throwUnexpectedError)
-    client.getRegisteredCourses({ year: 2020, userId }, (err, res) => {
+    mocked(getRegisteredCoursesByYearUseCase).mockImplementation(
+      throwUnexpectedError
+    )
+    client.getRegisteredCoursesByYear({ year: 2020, userId }, (err, res) => {
       expect(err).toBeTruthy()
       done()
     })
