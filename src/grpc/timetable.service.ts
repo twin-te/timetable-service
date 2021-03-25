@@ -6,6 +6,7 @@ import {
   DeleteTagsResponse,
   GetRegisteredCoursesResponse,
   GetTagsResponse,
+  RegisteredCourse,
   TimetableService,
   UpdateRegisteredCoursesResponse,
   UpdateTagsResponse,
@@ -25,6 +26,7 @@ import { updateRegisteredCourseUseCase } from '../usecase/updateRegisteredCourse
 import { updateTagsUseCase } from '../usecase/updateTags'
 import { deleteRegisteredCoursesUseCase } from '../usecase/deleteRegisteredCourses'
 import { deleteTagsUseCase } from '../usecase/deleteTags'
+import { getRegisteredCourseUseCase } from '../usecase/getRegisteredCourse'
 
 /**
  * TimetableServiceの実装
@@ -39,6 +41,14 @@ export const timetableService: GrpcServer<TimetableService> = {
           courses: entityToGrpcCourse(courses),
         })
       )
+    } catch (e) {
+      callback(toGrpcError(e))
+    }
+  },
+  async getRegisteredCourse({ request }, callback) {
+    try {
+      const res = await getRegisteredCourseUseCase(request)
+      callback(null, RegisteredCourse.create(entityToGrpcCourse([res])[0]))
     } catch (e) {
       callback(toGrpcError(e))
     }

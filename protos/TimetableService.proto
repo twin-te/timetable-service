@@ -7,7 +7,7 @@ service TimetableService {
   /* 指定された年度とユーザーの登録済み講義を取得する */
   rpc GetRegisteredCoursesByYear(GetRegisteredCoursesRequest) returns (GetRegisteredCoursesResponse);
   /* 指定されたidの講義を取得 */
-  /*rpc GetRegisteredCourses(GetRegisteredCourseRequest) returns (GetRegisteredCourseResponse);*/
+  rpc GetRegisteredCourse(GetRegisteredCourseRequest) returns (RegisteredCourse);
   /* 指定されたユーザーのタグをすべて取得する */
   rpc GetTags(GetTagsRequest) returns (GetTagsResponse);
   /* 講義を登録する */
@@ -34,11 +34,7 @@ message GetRegisteredCoursesResponse {
 
 message GetRegisteredCourseRequest {
   string userId = 1;
-  repeated string ids = 2;
-}
-
-message GetRegisteredCourseResponse {
-  repeated RegisteredCourse courses = 1;
+  string id = 2;
 }
 
 message GetTagsRequest {

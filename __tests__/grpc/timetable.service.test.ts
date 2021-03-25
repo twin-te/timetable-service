@@ -29,12 +29,14 @@ import { updateRegisteredCourseUseCase } from '../../src/usecase/updateRegistere
 import { updateTagsUseCase } from '../../src/usecase/updateTags'
 import { deleteRegisteredCoursesUseCase } from '../../src/usecase/deleteRegisteredCourses'
 import { deleteTagsUseCase } from '../../src/usecase/deleteTags'
+import { getRegisteredCourseUseCase } from '../../src/usecase/getRegisteredCourse'
 
 jest.mock('../../src/usecase/createRegisteredCourses')
 jest.mock('../../src/usecase/createTags')
 jest.mock('../../src/usecase/updateRegisteredCourses')
 jest.mock('../../src/usecase/updateTags')
 jest.mock('../../src/usecase/getRegisteredCoursesByYear')
+jest.mock('../../src/usecase/getRegisteredCourse')
 jest.mock('../../src/usecase/getTags')
 jest.mock('../../src/usecase/deleteRegisteredCourses')
 jest.mock('../../src/usecase/deleteTags')
@@ -95,7 +97,7 @@ const courses: IRegisteredCourseWithoutId[] = [
 
 const tags: ITagWithoutId[] = [{ userId, name: 'test tag' }]
 
-describe('getRegisteredCourses', () => {
+describe('getRegisteredCoursesByYear', () => {
   test('getRegisteredCourses', (done) => {
     mocked(getRegisteredCoursesByYearUseCase).mockImplementation(
       async ({ userId, year }) => {
@@ -125,6 +127,49 @@ describe('getRegisteredCourses', () => {
       throwUnexpectedError
     )
     client.getRegisteredCoursesByYear({ year: 2020, userId }, (err, res) => {
+      expect(err).toBeTruthy()
+      done()
+    })
+  })
+})
+
+describe('getRegisteredCourses', () => {
+  test('getRegisteredCourses', (done) => {
+    const _id = v4()
+    mocked(getRegisteredCourseUseCase).mockImplementation(
+      async ({ userId, id }) => {
+        expect(userId).toBe(userId)
+        expect(id).toBe(_id)
+        // @ts-ignore
+        return grpcCourseToEntity(courses).map(({ tags, ...cc }) => ({
+          ...cc,
+          tags: tags.map((t) => ({
+            id: t.id,
+            userId: cc.userId,
+            name: 'tag name',
+            courses: [],
+          })),
+        }))[0]
+      }
+    )
+    client.getRegisteredCourse({ id: _id, userId }, (err, res) => {
+      expect(err).toBeNull()
+      expect(res).toEqual(deepContaining(courses[0]))
+      done()
+    })
+  })
+  test('not found error', (done) => {
+    mocked(getRegisteredCourseUseCase).mockRejectedValueOnce(
+      new NotFoundError('指定された講義は登録されていません')
+    )
+    client.getRegisteredCourse({ id: v4(), userId }, (err, res) => {
+      expect(err?.code).toEqual(Status.NOT_FOUND)
+      done()
+    })
+  })
+  test('unexpected error', (done) => {
+    mocked(getRegisteredCourseUseCase).mockImplementation(throwUnexpectedError)
+    client.getRegisteredCourse({ id: v4(), userId }, (err, res) => {
       expect(err).toBeTruthy()
       done()
     })
