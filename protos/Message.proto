@@ -61,8 +61,8 @@ message NullableCourseMethodArray {
 message Tag {
   string id = 1;
   string userId = 2;
-  string name = 3;
-  int32 position = 4;
+  string name = 3; // update時に限って空文字の場合は変更なしとみなされる
+  int32 position = 4; // update時に限って<0の場合は変更なしとみなされる
 }
 
 /* タグ情報 id未確定（作成時） */

@@ -22,9 +22,11 @@ export async function updateTagsUseCase(tags: Input[]) {
     )
 
   return repository.save(
-    tags.map(({ name, ...tag }) => ({
+    tags.map(({ name, position, ...tag }) => ({
       ...tag,
-      name: name || target.find((t) => t.id === tag.id)!.name,
+      position:
+        position < 0 ? target.find((t) => t.id === tag.id)!.position : position, // < 0 の場合は変更なしとみなす
+      name: name || target.find((t) => t.id === tag.id)!.name, // 空文字の場合は変更なしとみなす
     }))
   )
 }
