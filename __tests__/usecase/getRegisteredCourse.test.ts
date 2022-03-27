@@ -12,8 +12,8 @@ import { deepContaining } from '../_deepContaining'
 
 const userId = v4()
 const tags = [
-  { id: v4(), userId, name: 'test tag1' },
-  { id: v4(), userId, name: 'test tag2' },
+  { id: v4(), userId, name: 'test tag1', position: 0 },
+  { id: v4(), userId, name: 'test tag2', position: 1 },
 ]
 
 const data = [

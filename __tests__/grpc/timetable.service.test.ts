@@ -106,10 +106,11 @@ describe('getRegisteredCoursesByYear', () => {
         // @ts-ignore
         return grpcCourseToEntity(courses).map(({ tags, ...cc }) => ({
           ...cc,
-          tags: tags.map((t) => ({
+          tags: tags.map((t, i) => ({
             id: t.id,
             userId: cc.userId,
             name: 'tag name',
+            position: i,
             courses: [],
           })),
         }))
@@ -143,10 +144,11 @@ describe('getRegisteredCourses', () => {
         // @ts-ignore
         return grpcCourseToEntity(courses).map(({ tags, ...cc }) => ({
           ...cc,
-          tags: tags.map((t) => ({
+          tags: tags.map((t, i) => ({
             id: t.id,
             userId: cc.userId,
             name: 'tag name',
+            position: i,
             courses: [],
           })),
         }))[0]
