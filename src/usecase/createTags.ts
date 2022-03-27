@@ -14,7 +14,7 @@ async function createTagsForUser(userId: string, names: string[]) {
     order: { position: 'DESC' },
     where: { userId },
   })
-  let lastId = lastTag?.position ?? 0
+  let lastId = lastTag?.position ?? -1
   return repository.save(
     names.map((name) => ({ id: v4(), name, userId, position: ++lastId }))
   )
