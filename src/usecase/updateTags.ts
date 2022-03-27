@@ -6,6 +6,7 @@ type Input = {
   id: string
   userId: string
   name: string
+  position: number
 }
 
 export async function updateTagsUseCase(tags: Input[]) {
@@ -19,5 +20,11 @@ export async function updateTagsUseCase(tags: Input[]) {
       undefined,
       tags.filter((c) => !target.find((t) => t.id === c.id)).map((c) => c.id)
     )
-  return repository.save(repository.create(tags))
+
+  return repository.save(
+    tags.map(({ name, ...tag }) => ({
+      ...tag,
+      name: name || target.find((t) => t.id === tag.id)!.name,
+    }))
+  )
 }
