@@ -43,7 +43,7 @@
     "pg": "^8.5.1",
     "protobufjs": "github:iFwu/protobuf.js",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.29",
+    "typeorm": "^0.2.45",
     "uuid": "^8.3.2"
   }
 }

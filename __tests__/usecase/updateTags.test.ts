@@ -10,8 +10,8 @@ import { deepContaining } from '../_deepContaining'
 
 const userId = v4()
 const data = [
-  { id: v4(), userId, name: 'test tag1' },
-  { id: v4(), userId, name: 'test tag2' },
+  { id: v4(), userId, name: 'test tag1', position: 0 },
+  { id: v4(), userId, name: 'test tag2', position: 1 },
 ]
 
 beforeAll(async () => {
@@ -31,7 +31,7 @@ test('正しいデータで更新できる', () => {
 
 test('存在しないデータでエラーになる', () => {
   return expect(
-    updateTagsUseCase([{ id: v4(), userId, name: '' }])
+    updateTagsUseCase([{ id: v4(), userId, name: '', position: 0 }])
   ).rejects.toThrow(NotFoundError)
 })
 

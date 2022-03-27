@@ -1,7 +1,16 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from 'typeorm'
+import {
+  Column,
+  Entity,
+  Index,
+  JoinTable,
+  ManyToMany,
+  PrimaryColumn,
+  Unique,
+} from 'typeorm'
 import { RegisteredCourse } from './registeredCourse'
 
 @Entity({ name: 'tags' })
+@Unique(['userId', 'position'], { deferrable: 'INITIALLY DEFERRED' })
 export class Tag {
   @PrimaryColumn({
     name: 'id',
@@ -20,6 +29,12 @@ export class Tag {
     type: 'text',
   })
   name!: string
+
+  @Column({
+    name: 'position',
+    type: 'integer',
+  })
+  position!: number
 
   @ManyToMany(() => RegisteredCourse, { cascade: ['remove'] })
   @JoinTable({
