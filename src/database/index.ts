@@ -3,6 +3,7 @@ import { createConnection, getConnection } from 'typeorm'
 import { logger } from '../logger'
 import { RegisteredCourse } from './model/registeredCourse'
 import { Tag } from './model/tag'
+import { TagColor } from './model/tagColor'
 /**
  * postgresへ接続
  */

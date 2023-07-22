@@ -1,7 +1,6 @@
 import {
   Column,
   Entity,
-  Index,
   JoinTable,
   ManyToMany,
   PrimaryColumn,
@@ -49,4 +48,10 @@ export class Tag {
     },
   })
   courses!: RegisteredCourse[]
+
+  @Column({
+    name: 'color_hex',
+    type: 'string',
+  })
+  colorHex!: string
 }
