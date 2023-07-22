@@ -51,7 +51,8 @@ export class Tag {
 
   @Column({
     name: 'color_hex',
-    type: 'string',
+    type: 'text',
+    default: '#ed7f93',
   })
   colorHex!: string
 }
