@@ -63,6 +63,7 @@ message Tag {
   string userId = 2;
   string name = 3; // update時に限って空文字の場合は変更なしとみなされる
   int32 position = 4; // update時に限って<0の場合は変更なしとみなされる
+  string colorHex = 5;
 }
 
 /* タグ情報 id未確定（作成時） */

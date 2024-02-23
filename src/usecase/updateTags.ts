@@ -7,6 +7,7 @@ type Input = {
   userId: string
   name: string
   position: number
+  colorHex: string
 }
 
 export async function updateTagsUseCase(tags: Input[]) {
@@ -22,11 +23,12 @@ export async function updateTagsUseCase(tags: Input[]) {
     )
 
   return repository.save(
-    tags.map(({ name, position, ...tag }) => ({
+    tags.map(({ name, position, colorHex, ...tag }) => ({
       ...tag,
       position:
         position < 0 ? target.find((t) => t.id === tag.id)!.position : position, // < 0 の場合は変更なしとみなす
       name: name || target.find((t) => t.id === tag.id)!.name, // 空文字の場合は変更なしとみなす
+      colorHex: colorHex || target.find((t) => t.id === tag.id)!.colorHex, // 空文字の場合は変更なしとみなす
     }))
   )
 }
